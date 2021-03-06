@@ -1,120 +1,62 @@
 package com.spring.chapter.three.models;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
+import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-public class Order {
+@Entity
+@Table(name="Taco_Order")
+public class Order implements Serializable {
 
-    @NotBlank(message="Name is required")
-    private String name;
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Long id;
+
+    private Date placedAt;
+
+    @NotBlank(message="Delivery name is required")
+    private String deliveryName;
+
     @NotBlank(message="Street is required")
-    private String street;
+    private String deliveryStreet;
+
     @NotBlank(message="City is required")
-    private String city;
+    private String deliveryCity;
+
     @NotBlank(message="State is required")
-    private String state;
+    private String deliveryState;
+
     @NotBlank(message="Zip code is required")
-    private String zip;
+    private String deliveryZip;
+
     @CreditCardNumber(message="Not a valid credit card number")
     private String ccNumber;
+
     @Pattern(regexp="^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$",
             message="Must be formatted MM/YY")
     private String ccExpiration;
+
     @Digits(integer=3, fraction=0, message="Invalid CVV")
     private String ccCVV;
 
-    public Order(){
+    @ManyToMany(targetEntity=Taco.class)
+    private List<Taco> tacos = new ArrayList<>();
 
+    public void addDesign(Taco design) {
+        this.tacos.add(design);
     }
 
-    public Order(String name, String street, String city, String state, String zip, String ccNumber, String ccExpiration, String ccCVV) {
-        this.name = name;
-        this.street = street;
-        this.city = city;
-        this.state = state;
-        this.zip = zip;
-        this.ccNumber = ccNumber;
-        this.ccExpiration = ccExpiration;
-        this.ccCVV = ccCVV;
+    @PrePersist
+    void placedAt() {
+        this.placedAt = new Date();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-    public String getCcNumber() {
-        return ccNumber;
-    }
-
-    public void setCcNumber(String ccNumber) {
-        this.ccNumber = ccNumber;
-    }
-
-    public String getCcExpiration() {
-        return ccExpiration;
-    }
-
-    public void setCcExpiration(String ccExpiration) {
-        this.ccExpiration = ccExpiration;
-    }
-
-    public String getCcCVV() {
-        return ccCVV;
-    }
-
-    public void setCcCVV(String ccCVV) {
-        this.ccCVV = ccCVV;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "name='" + name + '\'' +
-                ", street='" + street + '\'' +
-                ", city='" + city + '\'' +
-                ", state='" + state + '\'' +
-                ", zip='" + zip + '\'' +
-                ", ccNumber='" + ccNumber + '\'' +
-                ", ccExpiration='" + ccExpiration + '\'' +
-                ", ccCVV='" + ccCVV + '\'' +
-                '}';
-    }
 }
